@@ -32,11 +32,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build multi-platform image (without pushing)
-        id: docker_build
+      - name: Build amd64 image for testing
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
             --tag denokv:test \
             --output type=docker .
 
@@ -48,7 +47,7 @@ jobs:
         if: github.repository == 'mcandeia/denokv' && startsWith(github.ref, 'refs/tags/')
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-      - name: Push images
+      - name: Build and push multi-platform image
         if: github.repository == 'mcandeia/denokv' && startsWith(github.ref, 'refs/tags/')
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
